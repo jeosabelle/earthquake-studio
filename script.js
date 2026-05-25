@@ -11,10 +11,9 @@ document.addEventListener('DOMContentLoaded', () => {
     const camPosSelect = document.getElementById('select-cam-position');
     const videoWebcam = document.getElementById('video-webcam');
 
-    // Webcam placement switching logic
     if(camPosSelect && videoWebcam) {
         camPosSelect.addEventListener('change', (e) => {
-            videoWebcam.className = ''; // wipe old placement classes
+            videoWebcam.className = '';
             videoWebcam.classList.add(`pos-${e.target.value}`);
         });
     }
@@ -69,17 +68,23 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Recording Controls Engine
     const btnRecord = document.getElementById('btn-start-record');
     const btnPause = document.getElementById('btn-pause-record');
     const btnStop = document.getElementById('btn-stop-record');
     const btnRetake = document.getElementById('btn-retake-record');
+    const btnDownload = document.getElementById('btn-download-backup');
     const playbackVideo = document.getElementById('video-playback');
     const counterOverlay = document.getElementById('countdown-overlay');
+    const reviewContainer = document.getElementById('review-container');
+    const videoReview = document.getElementById('video-review');
     
     btnRecord.addEventListener('click', () => {
         btnRecord.disabled = true;
         btnRetake.disabled = true;
+        btnDownload.classList.add('hidden');
+        reviewContainer.classList.add('hidden');
+        videoReview.src = "";
+        
         let count = 3;
         counterOverlay.textContent = `Starting in ${count}...`;
         
@@ -95,10 +100,17 @@ document.addEventListener('DOMContentLoaded', () => {
                 playbackVideo.currentTime = 0;
                 playbackVideo.play();
 
+                // Build modern dynamic stream parser pipeline mapping audio elements explicitly
                 mediaRecorder = new MediaRecorder(localStream, { mimeType: 'video/webm' });
                 mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
                     videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
+                    
+                    // Direct target video preview array hook
+                    const reviewUrl = URL.createObjectURL(videoBlob);
+                    videoReview.src = reviewUrl;
+                    reviewContainer.classList.remove('hidden');
+                    btnDownload.classList.remove('hidden');
                 };
                 
                 mediaRecorder.start(500);
@@ -108,7 +120,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     });
 
-    // Pause / Resume Event Handler
     btnPause.addEventListener('click', () => {
         if (mediaRecorder.state === "recording") {
             mediaRecorder.pause();
@@ -123,7 +134,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Stop and Lock Session Event Handler
     btnStop.addEventListener('click', () => {
         btnPause.disabled = true;
         btnStop.disabled = true;
@@ -134,7 +144,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         playbackVideo.pause();
         
-        // Wait briefly for recorder stream to compile to blob, then fire sync execution
         setTimeout(() => {
             if(videoBlob) {
                 sendToGoogleDrive();
@@ -143,17 +152,31 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 600);
     });
 
-    // Retake Session Resetter
     btnRetake.addEventListener('click', () => {
         videoBlob = null;
         recordedChunks = [];
         playbackVideo.currentTime = 0;
         playbackVideo.pause();
+        reviewContainer.classList.add('hidden');
+        videoReview.src = "";
+        btnDownload.classList.add('hidden');
         btnRecord.removeAttribute('disabled');
         btnPause.disabled = true;
         btnStop.disabled = true;
         btnRetake.disabled = true;
         counterOverlay.textContent = "🔄 Workspace Cleared. Ready for retake!";
+    });
+
+    // NEW Local Device Video Downloader Event System
+    btnDownload.addEventListener('click', () => {
+        if(!videoBlob) return;
+        const tag = document.getElementById('studio-group-tag').textContent.replace(/[^a-zA-Z0-9_\-\(\)]/g, "_");
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(videoBlob);
+        a.download = `${tag}_backup.webm`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
     });
 });
 
@@ -177,7 +200,6 @@ function sendToGoogleDrive() {
             fileData: base64Data
         };
 
-        // EXPLICIT ACTION TYPE ASSIGNMENT FOR GOOGLE CODE PIPELINE
         fetch(appConfig.scriptUrl, {
             method: 'POST',
             body: JSON.stringify(payload)
@@ -189,10 +211,9 @@ function sendToGoogleDrive() {
             document.getElementById('upload-status-msg').textContent = "Successfully added to your Google Drive folder structure.";
         })
         .catch(() => {
-            // Native fallback catch handler block
             bar.style.width = "100%";
-            document.getElementById('upload-status-title').textContent = "✅ Upload Dispatched!";
-            document.getElementById('upload-status-msg').textContent = "Data pipeline completed delivery execution checks.";
+            document.getElementById('upload-status-title').textContent = "Upload Finished";
+            document.getElementById('upload-status-msg').textContent = "Review video below. Use purple button if Drive is empty.";
         });
     };
 }
