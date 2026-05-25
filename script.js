@@ -3,6 +3,9 @@ let mediaRecorder = null;
 let recordedChunks = [];
 let localStream = null;
 let videoBlob = null;
+let mixerCanvas = null;
+let mixerContext = null;
+let canvasAnimationId = null;
 
 document.addEventListener('DOMContentLoaded', () => {
     const btnSave = document.getElementById('btn-save-config');
@@ -59,7 +62,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
     document.getElementById('btn-start-cam').addEventListener('click', async () => {
         try {
-            localStream = await navigator.mediaDevices.getUserMedia({ video: true, audio: true });
+            localStream = await navigator.mediaDevices.getUserMedia({ video: { width: 640, height: 480 }, audio: true });
             document.getElementById('video-webcam').srcObject = localStream;
             document.getElementById('btn-start-record').removeAttribute('disabled');
             document.getElementById('btn-start-cam').style.display = "none";
@@ -100,13 +103,26 @@ document.addEventListener('DOMContentLoaded', () => {
                 playbackVideo.currentTime = 0;
                 playbackVideo.play();
 
-                // Build modern dynamic stream parser pipeline mapping audio elements explicitly
-                mediaRecorder = new MediaRecorder(localStream, { mimeType: 'video/webm' });
+                // Create an invisible canvas element to mix both video frames together
+                mixerCanvas = document.createElement('canvas');
+                mixerCanvas.width = 1280;
+                mixerCanvas.height = 720;
+                mixerContext = mixerCanvas.getContext('2d');
+
+                // Start the live mixing loops frame by frame
+                drawMixedFrames();
+
+                // Capture combined video track from canvas and audio track from student microphone
+                const canvasStream = mixerCanvas.captureStream(30); 
+                const audioTrack = localStream.getAudioTracks()[0];
+                if(audioTrack) {
+                    canvasStream.addTrack(audioTrack);
+                }
+
+                mediaRecorder = new MediaRecorder(canvasStream, { mimeType: 'video/webm;codecs=vp8,opus' });
                 mediaRecorder.ondataavailable = (e) => { if (e.data.size > 0) recordedChunks.push(e.data); };
                 mediaRecorder.onstop = () => {
                     videoBlob = new Blob(recordedChunks, { type: 'video/webm' });
-                    
-                    // Direct target video preview array hook
                     const reviewUrl = URL.createObjectURL(videoBlob);
                     videoReview.src = reviewUrl;
                     reviewContainer.classList.remove('hidden');
@@ -120,17 +136,20 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 1000);
     });
 
+    // Pause/Resume Frame Mixers
     btnPause.addEventListener('click', () => {
         if (mediaRecorder.state === "recording") {
             mediaRecorder.pause();
             playbackVideo.pause();
             btnPause.textContent = "▶ Resume";
             counterOverlay.textContent = "⏸ RECORDING PAUSED";
+            cancelAnimationFrame(canvasAnimationId);
         } else if (mediaRecorder.state === "paused") {
             mediaRecorder.resume();
             playbackVideo.play();
             btnPause.textContent = "⏸ Pause";
             counterOverlay.textContent = "🔴 RECORDING LIVE";
+            drawMixedFrames();
         }
     });
 
@@ -139,6 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
         btnStop.disabled = true;
         counterOverlay.textContent = "";
         
+        cancelAnimationFrame(canvasAnimationId);
         if(mediaRecorder && mediaRecorder.state !== "inactive") {
             mediaRecorder.stop();
         }
@@ -149,7 +169,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 sendToGoogleDrive();
                 btnRetake.removeAttribute('disabled');
             }
-        }, 600);
+        }, 800);
     });
 
     btnRetake.addEventListener('click', () => {
@@ -167,18 +187,57 @@ document.addEventListener('DOMContentLoaded', () => {
         counterOverlay.textContent = "🔄 Workspace Cleared. Ready for retake!";
     });
 
-    // NEW Local Device Video Downloader Event System
     btnDownload.addEventListener('click', () => {
         if(!videoBlob) return;
         const tag = document.getElementById('studio-group-tag').textContent.replace(/[^a-zA-Z0-9_\-\(\)]/g, "_");
         const a = document.createElement('a');
         a.href = URL.createObjectURL(videoBlob);
-        a.download = `${tag}_backup.webm`;
+        a.download = `${tag}_mixed_output.webm`;
         document.body.appendChild(a);
         a.click();
         document.body.removeChild(a);
     });
 });
+
+// The Core Video Merging Loop
+function drawMixedFrames() {
+    const bgVideo = document.getElementById('video-playback');
+    const camVideo = document.getElementById('video-webcam');
+    const pos = document.getElementById('select-cam-position').value;
+
+    if (!bgVideo || !camVideo || !mixerContext) return;
+
+    // 1. Draw main earthquake dialogue video spanning full background
+    mixerContext.drawImage(bgVideo, 0, 0, 1280, 720);
+
+    // 2. Determine corner layout coordinates for placing the webcam overlay
+    let camW = 280;
+    let camH = 210;
+    let camX = 1280 - camW - 30; // default bottom right
+    let camY = 720 - camH - 30;
+
+    if (pos === 'bottom-left') {
+        camX = 30;
+        camY = 720 - camH - 30;
+    } else if (pos === 'top-right') {
+        camX = 1280 - camW - 30;
+        camY = 30;
+    } else if (pos === 'top-left') {
+        camX = 30;
+        camY = 30;
+    }
+
+    // 3. Render webcam frame layout securely over background
+    mixerContext.save();
+    // Mirror webcam view so it acts naturally for students
+    mixerContext.translate(camX + camW, camY);
+    mixerContext.scale(-1, 1);
+    mixerContext.drawImage(camVideo, 0, 0, camW, camH);
+    mixerContext.restore();
+
+    // Loop at 30 frames per second continuously
+    canvasAnimationId = requestAnimationFrame(drawMixedFrames);
+}
 
 function sendToGoogleDrive() {
     const toast = document.getElementById('upload-status-toast');
@@ -204,8 +263,7 @@ function sendToGoogleDrive() {
             method: 'POST',
             body: JSON.stringify(payload)
         })
-        .then(res => res.json())
-        .then(data => {
+        .then(() => {
             bar.style.width = "100%";
             document.getElementById('upload-status-title').textContent = "✅ File Saved!";
             document.getElementById('upload-status-msg').textContent = "Successfully added to your Google Drive folder structure.";
