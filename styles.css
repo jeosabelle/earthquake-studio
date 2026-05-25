@@ -1,121 +1,52 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🎬 Earthquake Dubbing Studio</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
+:root {
+    --bg-main: #0c0c0e;
+    --bg-card: #16161a;
+    --text-primary: #ffffff;
+    --text-secondary: #94a3b8;
+    --primary: #3b82f6;
+    --accent: #10b981;
+    --danger: #ef4444;
+}
 
-    <div id="screen-config" class="container">
-        <div class="card">
-            <h1 class="title">🎬 Earthquake Emergency Dialogue</h1>
-            <p class="subtitle">Teacher Control Panel</p>
-            
-            <div class="form-group">
-                <label>Teacher Name</label>
-                <input type="text" id="input-teacher-name" value="Teacher Jeosa">
-            </div>
-            
-            <div class="form-group">
-                <label>Google Apps Script Web App URL</label>
-                <input type="text" id="input-script-url" placeholder="https://script.google.com/macros/s/.../exec">
-            </div>
-            
-            <div class="form-group">
-                <label>Google Drive Root Folder ID</label>
-                <input type="text" id="input-folder-id" value="1tGHPu6gwU-4UWCHAanK2PNyG27cz5WWh">
-            </div>
-            
-            <div class="form-group">
-                <label>Upload Video Asset (Silent Video)</label>
-                <input type="file" id="input-video-file" accept="video/*">
-            </div>
-            
-            <div class="form-group">
-                <label>Class Designations</label>
-                <textarea id="input-classes" rows="2">801,802,803,804,805,806,807,808,809,810</textarea>
-            </div>
-            
-            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                <button id="btn-save-config" type="button" class="btn btn-primary">Save Configuration</button>
-                <button id="btn-to-student-setup" type="button" class="btn btn-accent">Start Activity ➔</button>
-            </div>
-        </div>
-    </div>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { background-color: var(--bg-main); color: var(--text-primary); font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; overflow-x: hidden; }
+.hidden { display: none !important; }
 
-    <div id="screen-login" class="container hidden">
-        <div class="card" style="max-width: 450px;">
-            <h2 class="title">🔐 Student Check-In</h2>
-            <p class="subtitle">Earthquake Voice Actor Studio</p>
-            
-            <div class="form-group">
-                <label>Select Your Class</label>
-                <select id="select-class"></select>
-            </div>
-            
-            <div class="form-group">
-                <label>Group Number / Name</label>
-                <input type="text" id="input-group-name" placeholder="e.g., Group 1">
-            </div>
-            
-            <div class="form-group">
-                <label>Student Names in Group</label>
-                <input type="text" id="input-students" placeholder="e.g., Andy, Bella">
-            </div>
-            
-            <button id="btn-enter-studio" type="button" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Enter Recording Studio 🎬</button>
-        </div>
-    </div>
+.container { display: flex; justify-content: center; align-items: center; min-height: 100vh; padding: 20px; }
+.card { background-color: var(--bg-card); padding: 30px; border-radius: 12px; width: 100%; max-width: 600px; border: 1px solid #27272a; box-shadow: 0 10px 25px -5px rgba(0,0,0,0.5); }
+.title { font-size: 1.75rem; font-weight: 700; margin-bottom: 5px; text-align: center; background: linear-gradient(to right, #60a5fa, #a7f3d0); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+.subtitle { text-align: center; color: var(--text-secondary); margin-bottom: 25px; font-size: 0.95rem; }
 
-    <div id="screen-studio" class="studio-container hidden">
-        <div class="studio-header">
-            <span id="studio-group-tag" class="badge">Class - Group</span>
-            <span id="countdown-overlay" style="color: #ff3b30; font-weight: bold; margin-left: 15px;"></span>
-            
-            <div style="margin-left: auto; display: flex; align-items: center; gap: 10px; pointer-events: auto;">
-                <label style="font-size: 0.8rem; font-weight: bold; color: #94a3b8;">📷 CAMERA POSITION:</label>
-                <select id="select-cam-position" style="width: 140px; padding: 5px 10px; font-size: 0.85rem; background:#16161a;">
-                    <option value="bottom-right">Bottom Right</option>
-                    <option value="bottom-left">Bottom Left</option>
-                    <option value="top-right">Top Right</option>
-                    <option value="top-left">Top Left</option>
-                </select>
-            </div>
-        </div>
+.form-group { margin-bottom: 18px; }
+.form-group label { display: block; font-size: 0.85rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.05em; color: var(--text-secondary); margin-bottom: 6px; }
+input[type="text"], textarea, select { width: 100%; padding: 10px 14px; background-color: #0c0c0e; border: 1px solid #3f3f46; border-radius: 6px; color: white; font-size: 1rem; }
 
-        <div class="video-workspace-centered">
-            <div class="video-frame-wrapper">
-                <video id="video-playback" playsinline></video>
-                <video id="video-webcam" class="pos-bottom-right" autoplay muted playsinline></video>
-                
-                <div id="review-container" class="review-overlay hidden">
-                    <h3 style="margin-bottom: 10px; color: #10b981;">👀 Review Your Recording</h3>
-                    <video id="video-review" controls playsinline style="width: 100%; max-height: 55vh; border-radius: 6px; background: #000;"></video>
-                    <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 8px;">Listen close! If it looks good, check Google Drive or click Download below.</p>
-                </div>
-            </div>
-        </div>
+.btn { padding: 12px 24px; font-size: 1rem; font-weight: 600; border-radius: 6px; border: none; cursor: pointer; transition: all 0.2s; display: inline-flex; align-items: center; justify-content: center; }
+.btn:disabled { opacity: 0.3; cursor: not-allowed !important; pointer-events: none; }
+.btn-primary { background-color: var(--primary); color: white; }
+.btn-accent { background-color: var(--accent); color: white; }
+.btn-danger { background-color: var(--danger); color: white; }
+.btn-outline { background-color: transparent; border: 2px solid #3f3f46; color: white; }
+.btn:hover { transform: translateY(-1px); filter: brightness(1.1); }
 
-        <div class="studio-controls">
-            <button id="btn-start-cam" type="button" class="btn btn-outline">📹 Start Camera</button>
-            <button id="btn-start-record" type="button" class="btn btn-primary" disabled>🔴 Start Recording</button>
-            <button id="btn-pause-record" type="button" class="btn btn-outline" disabled>⏸ Pause</button>
-            <button id="btn-stop-record" type="button" class="btn btn-danger" disabled>⏹ Stop & Save</button>
-            <button id="btn-retake-record" type="button" class="btn btn-outline" style="border-color: #eab308; color: #eab308;" disabled>🔄 Retake / Delete</button>
-            <button id="btn-download-backup" type="button" class="btn btn-accent hidden" style="background-color: #7c3aed;">📥 Download Video Backup</button>
-        </div>
+.studio-container { display: flex; flex-direction: column; height: 100vh; width: 100vw; position: relative; background-color: #000; }
+.studio-header { position: absolute; top: 15px; left: 15px; right: 15px; z-index: 100; display: flex; align-items: center; pointer-events: none; }
+.badge { background-color: rgba(30, 41, 59, 0.85); padding: 6px 14px; border-radius: 20px; font-size: 0.9rem; font-weight: bold; border: 1px solid #3b82f6; backdrop-filter: blur(4px); }
 
-        <div id="upload-status-toast" class="toast hidden">
-            <div id="upload-status-title" style="font-weight: bold; margin-bottom: 5px;">Preparing Upload...</div>
-            <div class="progress-bar-container">
-                <div id="upload-progress" class="progress-bar-fill"></div>
-            </div>
-            <div id="upload-status-msg" style="font-size: 0.85rem; margin-top: 5px; color: #aaa;">Connecting to Google Drive...</div>
-        </div>
-    </div>
+.video-workspace-centered { flex: 1; display: flex; justify-content: center; align-items: center; padding: 40px; width: 100%; height: calc(100vh - 100px); }
+.video-frame-wrapper { position: relative; width: 85vw; height: 100%; max-height: 75vh; display: flex; justify-content: center; align-items: center; border-radius: 12px; overflow: hidden; background-color: #08080a; border: 2px solid #1e1e24; }
+#video-playback { width: 100%; height: 100%; object-fit: contain; }
 
-    <script src="script.js"></script>
-</body>
-</html>
+#video-webcam { position: absolute; width: 180px; height: 135px; border-radius: 8px; border: 2px solid var(--primary); object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.6); z-index: 50; background-color: #111; transform: scaleX(-1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
+
+.pos-bottom-right { bottom: 20px; right: 20px; }
+.pos-bottom-left { bottom: 20px; left: 20px; }
+.pos-top-right { top: 20px; right: 20px; }
+.pos-top-left { top: 20px; left: 20px; }
+
+.review-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(22, 22, 26, 0.98); z-index: 80; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; border-radius: 12px; }
+
+.studio-controls { height: 90px; background-color: #0c0c0e; display: flex; justify-content: center; align-items: center; gap: 15px; border-top: 1px solid #1e1e24; z-index: 60; }
+.toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); width: 350px; background-color: #16161a; border: 1px solid #27272a; padding: 15px; border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); z-index: 200; }
+.progress-bar-container { background-color: #27272a; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 8px; }
+.progress-bar-fill { background-color: var(--accent); width: 0%; height: 100%; transition: width 0.3s ease; }
