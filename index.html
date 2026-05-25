@@ -8,61 +8,44 @@
 </head>
 <body>
 
-    <div id="screen-config" class="container">
-        <div class="card">
-            <h1 class="title">🎬 Earthquake Emergency Dialogue</h1>
-            <p class="subtitle">Teacher Control Panel</p>
-            
-            <div class="form-group">
-                <label>Teacher Name</label>
-                <input type="text" id="input-teacher-name" value="Teacher Jeosa">
-            </div>
-            
-            <div class="form-group">
-                <label>Google Apps Script Web App URL</label>
-                <input type="text" id="input-script-url" placeholder="https://script.google.com/macros/s/.../exec">
-            </div>
-            
-            <div class="form-group">
-                <label>Google Drive Root Folder ID</label>
-                <input type="text" id="input-folder-id" value="1tGHPu6gwU-4UWCHAanK2PNyG27cz5WWh">
-            </div>
-            
-            <div class="form-group">
-                <label>Upload Video Asset (Silent Video)</label>
-                <input type="file" id="input-video-file" accept="video/*">
-            </div>
-            
-            <div class="form-group">
-                <label>Class Designations</label>
-                <textarea id="input-classes" rows="2">801,802,803,804,805,806,807,808,809,810</textarea>
-            </div>
-            
-            <div style="display: flex; gap: 15px; margin-top: 20px;">
-                <button id="btn-save-config" type="button" class="btn btn-primary">Save Configuration</button>
-                <button id="btn-to-student-setup" type="button" class="btn btn-accent">Start Activity ➔</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="screen-login" class="container hidden">
+    <div id="screen-login" class="container">
         <div class="card" style="max-width: 450px;">
-            <h2 class="title">🔐 Student Check-In</h2>
-            <p class="subtitle">Earthquake Voice Actor Studio</p>
+            <h1 class="title">🎬 Earthquake Emergency Dialogue</h1>
+            <p class="subtitle">Voice Actor Studio Check-In</p>
             
             <div class="form-group">
-                <label>Select Your Class</label>
-                <select id="select-class"></select>
+                <label>Select Your Class / 選擇班級</label>
+                <select id="select-class">
+                    <option value="801">801</option>
+                    <option value="802">802</option>
+                    <option value="803">803</option>
+                    <option value="804">804</option>
+                    <option value="805">805</option>
+                    <option value="806">806</option>
+                    <option value="807">807</option>
+                    <option value="808">808</option>
+                    <option value="809">809</option>
+                    <option value="810">810</option>
+                    <option value="811">811</option>
+                    <option value="812">812</option>
+                    <option value="813">813</option>
+                    <option value="814">814</option>
+                </select>
             </div>
             
             <div class="form-group">
-                <label>Group Number / Name</label>
+                <label>Group Number / 組別</label>
                 <input type="text" id="input-group-name" placeholder="e.g., Group 1">
             </div>
             
             <div class="form-group">
-                <label>Student Names in Group</label>
-                <input type="text" id="input-students" placeholder="e.g., Andy, Bella">
+                <label>Student Numbers in Group / 座號</label>
+                <input type="text" id="input-students" placeholder="e.g., 05, 12, 23">
+            </div>
+
+            <div class="form-group">
+                <label>Step 1: Choose Silent Video File / 選擇影片</label>
+                <input type="file" id="input-video-file" accept="video/*" style="padding: 5px 0;">
             </div>
             
             <button id="btn-enter-studio" type="button" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Enter Recording Studio 🎬</button>
@@ -91,9 +74,9 @@
                 <video id="video-webcam" class="pos-bottom-right" autoplay muted playsinline></video>
                 
                 <div id="review-container" class="review-overlay hidden">
-                    <h3 style="margin-bottom: 10px; color: #10b981;">👀 Review Your Recording</h3>
+                    <h3 style="margin-bottom: 10px; color: #10b981;">👀 Review Your Recording / 預覽影片</h3>
                     <video id="video-review" controls playsinline style="width: 100%; max-height: 55vh; border-radius: 6px; background: #000;"></video>
-                    <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 8px;">Listen close! If it looks good, check Google Drive or click Download below.</p>
+                    <p style="font-size: 0.85rem; color: #94a3b8; margin-top: 8px;">Listen close! Click the purple button below to save your finished video.</p>
                 </div>
             </div>
         </div>
@@ -102,17 +85,9 @@
             <button id="btn-start-cam" type="button" class="btn btn-outline">📹 Start Camera</button>
             <button id="btn-start-record" type="button" class="btn btn-primary" disabled>🔴 Start Recording</button>
             <button id="btn-pause-record" type="button" class="btn btn-outline" disabled>⏸ Pause</button>
-            <button id="btn-stop-record" type="button" class="btn btn-danger" disabled>⏹ Stop & Save</button>
+            <button id="btn-stop-record" type="button" class="btn btn-danger" disabled>⏹ Stop Recording</button>
             <button id="btn-retake-record" type="button" class="btn btn-outline" style="border-color: #eab308; color: #eab308;" disabled>🔄 Retake / Delete</button>
-            <button id="btn-download-backup" type="button" class="btn btn-accent hidden" style="background-color: #7c3aed;">📥 Download Video Backup</button>
-        </div>
-
-        <div id="upload-status-toast" class="toast hidden">
-            <div id="upload-status-title" style="font-weight: bold; margin-bottom: 5px;">Preparing Upload...</div>
-            <div class="progress-bar-container">
-                <div id="upload-progress" class="progress-bar-fill"></div>
-            </div>
-            <div id="upload-status-msg" style="font-size: 0.85rem; margin-top: 5px; color: #aaa;">Connecting to Google Drive...</div>
+            <button id="btn-download-backup" type="button" class="btn btn-accent hidden" style="background-color: #7c3aed;">📥 Download Mixed Video</button>
         </div>
     </div>
 
