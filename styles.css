@@ -37,13 +37,15 @@ input[type="text"], textarea, select { width: 100%; padding: 10px 14px; backgrou
 .video-frame-wrapper { position: relative; width: 85vw; height: 100%; max-height: 75vh; display: flex; justify-content: center; align-items: center; border-radius: 12px; overflow: hidden; background-color: #08080a; border: 2px solid #1e1e24; }
 #video-playback { width: 100%; height: 100%; object-fit: contain; }
 
-/* Webcam Layout & Snapping Position Filters */
 #video-webcam { position: absolute; width: 180px; height: 135px; border-radius: 8px; border: 2px solid var(--primary); object-fit: cover; box-shadow: 0 10px 20px rgba(0,0,0,0.6); z-index: 50; background-color: #111; transform: scaleX(-1); transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1); }
 
 .pos-bottom-right { bottom: 20px; right: 20px; }
 .pos-bottom-left { bottom: 20px; left: 20px; }
 .pos-top-right { top: 20px; right: 20px; }
 .pos-top-left { top: 20px; left: 20px; }
+
+/* NEW Style Wrapper for Student Review Dashboard */
+.review-overlay { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(22, 22, 26, 0.98); z-index: 80; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 30px; border-radius: 12px; }
 
 .studio-controls { height: 90px; background-color: #0c0c0e; display: flex; justify-content: center; align-items: center; gap: 15px; border-top: 1px solid #1e1e24; z-index: 60; }
 .toast { position: fixed; bottom: 110px; left: 50%; transform: translateX(-50%); width: 350px; background-color: #16161a; border: 1px solid #27272a; padding: 15px; border-radius: 8px; box-shadow: 0 20px 25px -5px rgba(0,0,0,0.7); z-index: 200; }
