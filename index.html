@@ -2,168 +2,108 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🎬 Earthquake Dubbing Studio</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
 
-    <div class="studio-container">
-        <header class="studio-header">
-            <h1 id="display-activity-title">🎬 Earthquake Dubbing Studio</h1>
-            <p class="subtitle">"Be the Voice Actors!"</p>
-        </header>
-
-        <section id="screen-teacher" class="studio-card active">
-            <h2>⚙️ Teacher Configuration Panel</h2>
-            <div class="form-grid">
-                <div class="form-group">
-                    <label>Activity Title</label>
-                    <input type="text" id="cfg-title" value="Earthquake Emergency Dialogue">
-                </div>
-                <div class="form-group">
-                    <label>Teacher Name</label>
-                    <input type="text" id="cfg-teacher" value="Mr. Smith">
-                </div>
-                <div class="form-group grid-span-2">
-                    <label>Google Apps Script Web App URL</label>
-                    <input type="url" id="cfg-script-url" placeholder="https://script.google.com/macros/s/.../exec">
-                </div>
-                <div class="form-group grid-span-2">
-                    <label>Google Drive Root Folder ID</label>
-                    <input type="text" id="cfg-folder-id" placeholder="1A2b3C4d5E6f7G8h9I0j...">
-                </div>
-                <div class="form-group grid-span-2">
-                    <label>Class List (One per line)</label>
-                    <textarea id="cfg-classes" rows="4">801&#10;802&#10;803&#10;804&#10;805&#10;806&#10;807&#10;808&#10;809&#10;810</textarea>
-                </div>
-                <div class="form-group">
-                    <label>Upload Video Asset</label>
-                    <input type="file" id="cfg-video-file" accept="video/*">
-                </div>
-                <div class="form-group">
-                    <label>Overlay Position</label>
-                    <select id="cfg-cam-pos">
-                        <option value="top-left">Top Left</option>
-                        <option value="top-right" selected>Top Right</option>
-                        <option value="bottom-left">Bottom Left</option>
-                        <option value="bottom-right">Bottom Right</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label>Overlay Size</label>
-                    <select id="cfg-cam-size">
-                        <option value="small">Small (120px)</option>
-                        <option value="medium" selected>Medium (180px)</option>
-                        <option value="large">Large (240px)</option>
-                    </select>
-                </div>
-                <div class="form-group toggle-group">
-                    <label for="cfg-safe-mode">Subtitle Safe Mode</label>
-                    <input type="checkbox" id="cfg-safe-mode" checked>
-                </div>
+    <!-- 1. CONFIGURATION SCREEN -->
+    <div id="screen-config" class="container">
+        <div class="card">
+            <h1 class="title">🎬 Earthquake Emergency Dialogue</h1>
+            <p class="subtitle">Teacher Control Panel</p>
+            
+            <div class="form-group">
+                <label>Teacher Name</label>
+                <input type="text" id="input-teacher-name" value="Teacher Jeosa">
             </div>
-            <div class="action-row">
+            
+            <div class="form-group">
+                <label>Google Apps Script Web App URL</label>
+                <input type="text" id="input-script-url" placeholder="https://script.google.com/macros/s/.../exec">
+            </div>
+            
+            <div class="form-group">
+                <label>Google Drive Root Folder ID</label>
+                <input type="text" id="input-folder-id" placeholder="The long string of letters and numbers from your Drive link">
+            </div>
+            
+            <div class="form-group">
+                <label>Upload Video Asset (Silent Video)</label>
+                <input type="file" id="input-video-file" accept="video/*">
+            </div>
+            
+            <div class="form-group">
+                <label>Class Designations</label>
+                <textarea id="input-classes" rows="2">801,802,803,804,805,806,807,808,809,810</textarea>
+            </div>
+            
+            <div style="display: flex; gap: 15px; margin-top: 20px;">
                 <button id="btn-save-config" class="btn btn-primary">Save Configuration</button>
                 <button id="btn-to-student-setup" class="btn btn-accent" disabled>Start Activity ➔</button>
             </div>
-        </section>
-
-        <section id="screen-student" class="studio-card">
-            <h2>👥 Student Setup</h2>
-            <div class="student-layout">
-                <div class="instructions-panel">
-                    <h3>How to Play:</h3>
-                    <ol>
-                        <li><span>1</span> Turn on your camera & mic.</li>
-                        <li><span>2</span> Practice your lines with your team.</li>
-                        <li><span>3</span> Press <strong>Start Recording</strong> to roll.</li>
-                        <li><span>4</span> Perform your dialogue matching the screen.</li>
-                        <li><span>5</span> Hit <strong>Stop & Save</strong> to auto-submit!</li>
-                    </ol>
-                </div>
-                <div class="form-container">
-                    <div class="form-group">
-                        <label>Select Your Class</label>
-                        <select id="student-class"></select>
-                    </div>
-                    <div class="form-group">
-                        <label>Group ID / Number</label>
-                        <input type="text" id="student-group" placeholder="e.g., Group 3">
-                    </div>
-                    <div class="form-group">
-                        <label>Student Roles & Names</label>
-                        <input type="text" id="student-name-1" placeholder="Student 1 Name (e.g., Andy)">
-                        <input type="text" id="student-name-2" placeholder="Student 2 Name (e.g., Mary)">
-                        <input type="text" id="student-name-3" placeholder="Student 3 Name (e.g., Kevin) (Optional)">
-                        <input type="text" id="student-name-4" placeholder="Student 4 Name (Optional)">
-                        <input type="text" id="student-name-5" placeholder="Student 5 Name (Optional)">
-                    </div>
-                    <button id="btn-start-studio" class="btn btn-accent full-width">Enter Recording Studio 🎬</button>
-                </div>
-            </div>
-        </section>
-
-        <section id="screen-studio" class="studio-card large-studio">
-            <div class="studio-layout">
-                
-                <div class="workspace-main">
-                    <div class="video-stage-container">
-                        <canvas id="studio-canvas" width="854" height="480"></canvas>
-                        
-                        <video id="hidden-video" playsinline></video>
-                        <video id="hidden-camera" autoplay playsinline muted></video>
-
-                        <div id="rec-indicator" class="rec-indicator hidden">
-                            <span class="pulse-dot"></span> RECORDING <span id="rec-timer">00:00</span>
-                        </div>
-                        
-                        <div id="countdown-overlay" class="countdown-overlay hidden">3</div>
-                    </div>
-
-                    <div class="player-controls">
-                        <button id="btn-play-asset" class="btn btn-sm">▶ Play</button>
-                        <button id="btn-pause-asset" class="btn btn-sm">⏸ Pause</button>
-                        <button id="btn-restart-asset" class="btn btn-sm">🔄 Restart</button>
-                        <button id="btn-mute-asset" class="btn btn-sm">🔊 Mute Music</button>
-                        <span id="hardware-status" class="status-tag">Mic/Cam: Off</span>
-                    </div>
-
-                    <div class="studio-actions">
-                        <div class="action-group">
-                            <button id="btn-toggle-cam" class="btn btn-primary">Start Camera</button>
-                            <button id="btn-flip-cam" class="btn btn-secondary" disabled>Flip Camera</button>
-                        </div>
-                        <div class="action-group">
-                            <button id="btn-start-rec" class="btn btn-accent" disabled>🔴 Start Recording</button>
-                            <button id="btn-pause-rec" class="btn btn-secondary" disabled>⏸ Pause Rec</button>
-                            <button id="btn-stop-rec" class="btn btn-danger" disabled>⏹ Stop & Save</button>
-                        </div>
-                    </div>
-
-                    <div id="post-record-actions" class="studio-actions hidden">
-                        <button id="btn-preview-playback" class="btn btn-primary">Preview Recording</button>
-                        <button id="btn-record-again" class="btn btn-secondary">Record Again</button>
-                        <button id="btn-backup-download" class="btn btn-secondary">Download Backup Copy</button>
-                    </div>
-
-                    <div id="upload-panel" class="upload-panel hidden">
-                        <h4 id="upload-status-text">Uploading to Teacher's Google Drive...</h4>
-                        <div class="progress-bar-container">
-                            <div id="upload-progress" class="progress-bar-fill"></div>
-                        </div>
-                        <p id="upload-percentage">0%</p>
-                    </div>
-                </div>
-
-<div id="group-tag-display" class="group-tag" style="position: absolute; top: 10px; left: 10px; z-index: 10;">801 - Group 3</div>
-                </div>
-
-            </div>
-        </section>
+        </div>
     </div>
 
-    <div id="system-toast" class="toast hidden"></div>
-<script src="script.js"></script>
+    <!-- 2. STUDENT LOGIN SCREEN -->
+    <div id="screen-login" class="container hidden">
+        <div class="card" style="max-width: 450px;">
+            <h2 class="title">🔐 Student Check-In</h2>
+            <p class="subtitle" id="display-activity-title">Earthquake Voice Actor Studio</p>
+            
+            <div class="form-group">
+                <label>Select Your Class</label>
+                <select id="select-class"></select>
+            </div>
+            
+            <div class="form-group">
+                <label>Group Number / Name</label>
+                <input type="text" id="input-group-name" placeholder="e.g., Group 1 or Super Stars">
+            </div>
+            
+            <div class="form-group">
+                <label>Student Names in Group</label>
+                <input type="text" id="input-students" placeholder="e.g., Andy, Bella, Charlie">
+            </div>
+            
+            <button id="btn-enter-studio" class="btn btn-primary" style="width: 100%; margin-top: 15px;">Enter Recording Studio 🎬</button>
+        </div>
+    </div>
+
+    <!-- 3. MAIN FULL-SCREEN RECORDING STUDIO -->
+    <div id="screen-studio" class="studio-container hidden">
+        <!-- Floating Info Bar -->
+        <div class="studio-header">
+            <span id="studio-group-tag" class="badge">Class - Group</span>
+            <span id="countdown-overlay" style="color: #ff3b30; font-weight: bold; margin-left: 15px;"></span>
+        </div>
+
+        <!-- Centered Giant Video Canvas Container -->
+        <div class="video-workspace-centered">
+            <div class="video-frame-wrapper">
+                <video id="video-playback" playsinline></video>
+                <!-- Small Webcam Overlay Box tucked in the corner -->
+                <video id="video-webcam" autoplay muted playsinline></video>
+            </div>
+        </div>
+
+        <!-- Controls Bar at the Bottom -->
+        <div class="studio-controls">
+            <button id="btn-start-cam" class="btn btn-outline">📹 Start Camera</button>
+            <button id="btn-start-record" class="btn btn-primary" disabled>🔴 Start Recording</button>
+            <button id="btn-stop-record" class="btn btn-danger" disabled>⏹ Stop & Save</button>
+        </div>
+
+        <!-- Upload Status Floating Toast Notification -->
+        <div id="upload-status-toast" class="toast hidden">
+            <div id="upload-status-title" style="font-weight: bold; margin-bottom: 5px;">Preparing Upload...</div>
+            <div class="progress-bar-container">
+                <div id="upload-progress" class="progress-bar-fill"></div>
+            </div>
+            <div id="upload-status-msg" style="font-size: 0.85rem; margin-top: 5px; color: #aaa;">Connecting to Google Drive...</div>
+        </div>
+    </div>
+
 </body>
 </html>
