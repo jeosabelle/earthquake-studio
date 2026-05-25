@@ -1,3 +1,5 @@
+// Paste your Video string code between the quotes in videoAssetData if embedding entirely!
+let videoAssetData = ""; 
 let mediaRecorder = null;
 let recordedChunks = [];
 let localStream = null;
@@ -10,6 +12,16 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnEnter = document.getElementById('btn-enter-studio');
     const camPosSelect = document.getElementById('select-cam-position');
     const videoWebcam = document.getElementById('video-webcam');
+    const playbackVideo = document.getElementById('video-playback');
+
+    // Automatically assign video source asset if embedded
+    if (videoAssetData && videoAssetData.length > 10) {
+        playbackVideo.src = videoAssetData;
+    } else {
+        // Fallback default sample file link if you prefer to load it from an external web address link
+        playbackVideo.src = "earthquake.mp4"; 
+    }
+    playbackVideo.load();
 
     if(camPosSelect && videoWebcam) {
         camPosSelect.addEventListener('change', (e) => {
@@ -18,27 +30,11 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // Handle local earthquake video asset upload preview tracking
-    document.getElementById('input-video-file').addEventListener('change', (e) => {
-        const file = e.target.files[0];
-        if (file) {
-            document.getElementById('video-playback').src = URL.createObjectURL(file);
-            document.getElementById('video-playback').load();
-        }
-    });
-
     btnEnter.addEventListener('click', () => {
-        const fileInput = document.getElementById('input-video-file');
-        if (!fileInput.files || fileInput.files.length === 0) {
-            alert("⚠️ Please select the earthquake video file first!\n請先選擇地震影片檔案！");
-            return;
-        }
-
         const cls = document.getElementById('select-class').value;
         const group = document.getElementById('input-group-name').value.trim() || "Group";
         const students = document.getElementById('input-students').value.trim() || "NoNumbers";
         
-        // Formats filename perfectly for grading (e.g., "803_Group2_Nos_05_12_23")
         document.getElementById('studio-group-tag').textContent = `${cls}_${group.replace(/\s+/g, '')}_Nos_${students.replace(/[^a-zA-Z0-9]/g, '_')}`;
         
         document.getElementById('screen-login').classList.add('hidden');
@@ -61,7 +57,6 @@ document.addEventListener('DOMContentLoaded', () => {
     const btnStop = document.getElementById('btn-stop-record');
     const btnRetake = document.getElementById('btn-retake-record');
     const btnDownload = document.getElementById('btn-download-backup');
-    const playbackVideo = document.getElementById('video-playback');
     const counterOverlay = document.getElementById('countdown-overlay');
     const reviewContainer = document.getElementById('review-container');
     const videoReview = document.getElementById('video-review');
@@ -88,7 +83,6 @@ document.addEventListener('DOMContentLoaded', () => {
                 playbackVideo.currentTime = 0;
                 playbackVideo.play();
 
-                // Canvas mixing window dimensions
                 mixerCanvas = document.createElement('canvas');
                 mixerCanvas.width = 1280;
                 mixerCanvas.height = 720;
